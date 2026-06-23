@@ -6,7 +6,8 @@ const app = express();
 // Serve frontend from /public — no CORS needed, same origin
 app.use(express.static(path.join(__dirname, 'public')));
 
-const JIRA_BASE = 'https://fnpcom.atlassian.net';
+const CLOUD_ID = '806e70f1-2657-44d4-8a09-fdf3874aad06';
+const JIRA_BASE = `https://api.atlassian.com/ex/jira/${CLOUD_ID}`;
 const AUTH = 'Basic ' + Buffer.from(
   `${process.env.JIRA_EMAIL}:${process.env.JIRA_TOKEN}`
 ).toString('base64');
