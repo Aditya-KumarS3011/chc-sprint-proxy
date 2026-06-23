@@ -6,28 +6,31 @@ const app = express();
 // Serve frontend from /public — no CORS needed, same origin
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Use environment variable for Cloud ID, or fallback to hardcoded
-const CLOUD_ID = process.env.JIRA_CLOUD_ID || '806e70f1-2657-44d4-8a09-fdf3874aad06';
-const JIRA_DOMAIN = process.env.JIRA_DOMAIN; // e.g., 'yourcompany.atlassian.net'
+// Jira domain is required - set JIRA_DOMAIN env variable (e.g., 'yourcompany.atlassian.net')
+const JIRA_DOMAIN = process.env.JIRA_DOMAIN;
 
-// Function to get the correct Jira base URL
-function getJiraBase() {
-  if (JIRA_DOMAIN) {
-    return `https://${JIRA_DOMAIN}`;
-  }
-  return `https://api.atlassian.com/ex/jira/${CLOUD_ID}`;
+if (!JIRA_DOMAIN) {
+  console.error('ERROR: JIRA_DOMAIN environment variable is required');
+  console.error('Set it to your Jira domain, e.g., yourcompany.atlassian.net');
 }
 
+const JIRA_BASE = JIRA_DOMAIN ? `https://${JIRA_DOMAIN}` : null;
 const AUTH = 'Basic ' + Buffer.from(
   `${process.env.JIRA_EMAIL}:${process.env.JIRA_TOKEN}`
 ).toString('base64');
 
 app.get('/api/sprint', async (req, res) => {
   try {
+    if (!JIRA_BASE) {
+      return res.status(500).json({ 
+        error: 'Configuration error',
+        message: 'JIRA_DOMAIN environment variable is not set'
+      });
+    }
+
     const project = req.query.project || 'CHC';
     const jql = `project = ${project} AND sprint in openSprints() ORDER BY issuetype ASC, created ASC`;
     const fields = 'summary,issuetype,status,assignee,parent,priority';
-    const JIRA_BASE = getJiraBase();
     const url = `${JIRA_BASE}/rest/api/3/search?jql=${encodeURIComponent(jql)}&fields=${fields}&maxResults=100`;
 
     console.log(`Fetching from: ${JIRA_BASE}/rest/api/3/search`);
@@ -45,7 +48,7 @@ app.get('/api/sprint', async (req, res) => {
         error: 'Jira API error', 
         status: response.status,
         message: errorText,
-        url: JIRA_BASE
+        domain: JIRA_DOMAIN
       });
     }
 
