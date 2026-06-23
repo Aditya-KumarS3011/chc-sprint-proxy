@@ -16,13 +16,12 @@ app.get('/api/sprint', async (req, res) => {
   try {
     const project = req.query.project || 'CHC';
     const jql = `project = ${project} AND sprint in openSprints() ORDER BY issuetype ASC, created ASC`;
-    const fields = ['summary', 'issuetype', 'status', 'assignee', 'parent', 'priority'];
-    const url = `${JIRA_BASE}/rest/api/3/issue/search`;
+    const fields = 'summary,issuetype,status,assignee,parent,priority';
+    const url = `${JIRA_BASE}/rest/api/3/search?jql=${encodeURIComponent(jql)}&fields=${fields}&maxResults=100`;
 
     const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Authorization': AUTH, 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jql, fields, maxResults: 100 })
+      method: 'GET',
+      headers: { 'Authorization': AUTH, 'Accept': 'application/json' }
     });
 
     if (!response.ok) {
