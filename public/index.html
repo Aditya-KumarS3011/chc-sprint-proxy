@@ -3,22 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CHC Sprint Dashboard</title>
+<title id="page-title">FNP Sprint Hub</title>
 <style>
 :root { color-scheme: light; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a1a; font-size: 13px; }
 
-.header { background: #fff; border-bottom: 1px solid #e8e8e6; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
-.header-left h1 { font-size: 16px; font-weight: 600; }
-.header-left p { font-size: 11px; color: #888; margin-top: 2px; }
+.header { background: #fff; border-bottom: 1px solid #e8e8e6; padding: 11px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 20; }
+.header-left h1 { font-size: 15px; font-weight: 600; }
+.header-left p { font-size: 11px; color: #888; margin-top: 1px; }
 .header-right { display: flex; align-items: center; gap: 10px; }
-.refresh-btn { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 6px 14px; font-size: 12px; color: #555; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+.refresh-btn { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 5px 12px; font-size: 12px; color: #555; cursor: pointer; display: flex; align-items: center; gap: 5px; }
 .refresh-btn:hover { background: #f5f5f3; }
 .last-updated { font-size: 11px; color: #aaa; }
 
-.stats-bar { display: flex; gap: 8px; padding: 12px 20px; background: #fff; border-bottom: 1px solid #e8e8e6; flex-wrap: wrap; }
-.stat-chip { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 99px; font-size: 11px; font-weight: 500; border: 1px solid; }
+.pod-tabs { background: #fff; border-bottom: 1px solid #e8e8e6; padding: 0 16px; display: flex; overflow-x: auto; position: sticky; top: 48px; z-index: 19; scrollbar-width: none; }
+.pod-tabs::-webkit-scrollbar { display: none; }
+.pod-tab { padding: 9px 13px; font-size: 12px; font-weight: 500; color: #888; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; flex-shrink: 0; }
+.pod-tab:hover { color: #333; }
+.pod-tab.active { color: #534AB7; border-bottom-color: #534AB7; font-weight: 600; }
+.tab-sep { width: 1px; background: #e8e8e6; margin: 8px 4px; flex-shrink: 0; }
+.report-tab { padding: 6px 13px; margin: auto 0 auto 4px; font-size: 11px; font-weight: 600; color: #534AB7; background: #eeedfe; border: 1.5px solid #c5c2f5; border-radius: 99px; cursor: pointer; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; gap: 5px; }
+.report-tab:hover { background: #dddcfd; }
+.report-tab.active { background: #534AB7; color: #fff; border-color: #534AB7; }
+
+.stats-bar { display: flex; gap: 7px; padding: 9px 20px; background: #fff; border-bottom: 1px solid #e8e8e6; flex-wrap: wrap; }
+.stat-chip { display: flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 500; border: 1px solid; }
 .chip-total { background: #f5f5f3; border-color: #ddd; color: #555; }
 .chip-done { background: #edf7ee; border-color: #b5ddb7; color: #2d7a31; }
 .chip-dev { background: #e8f1fb; border-color: #b3ccee; color: #1a5fa8; }
@@ -26,106 +36,188 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .chip-blocked { background: #fdecea; border-color: #f5b8b3; color: #c0392b; }
 .stat-num { font-weight: 700; font-size: 13px; }
 
-.main { padding: 16px 20px; max-width: 960px; margin: 0 auto; }
-
-.legend { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-.sb { display: inline-flex; align-items: center; font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 500; white-space: nowrap; }
-.s-done { background: #edf7ee; color: #2d7a31; }
-.s-dev { background: #e8f1fb; color: #1a5fa8; }
-.s-rfqa { background: #fff8e6; color: #8a6500; }
-.s-inqa { background: #e1f5ee; color: #0f6e56; }
-.s-todo { background: #f0f0ee; color: #666; }
-.s-blocked { background: #fdecea; color: #c0392b; }
+.main { padding: 14px 20px; max-width: 1000px; margin: 0 auto; }
+.legend { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+.sb { display: inline-flex; align-items: center; font-size: 10px; padding: 2px 7px; border-radius: 99px; font-weight: 500; white-space: nowrap; }
+.s-done   { background: #edf7ee; color: #2d7a31; }
+.s-dev    { background: #e8f1fb; color: #1a5fa8; }
+.s-rfqa   { background: #fff8e6; color: #8a6500; }
+.s-inqa   { background: #e1f5ee; color: #0f6e56; }
+.s-todo   { background: #f0f0ee; color: #666; }
+.s-blocked{ background: #fdecea; color: #c0392b; }
 .s-reopen { background: #fdecea; color: #c0392b; }
 
-.epic-block { background: #fff; border: 1px solid #e8e8e6; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
-.epic-hdr { width: 100%; background: none; border: none; padding: 13px 16px; display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; }
+.epic-block { background: #fff; border: 1px solid #e8e8e6; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+.epic-hdr { width: 100%; background: none; border: none; padding: 11px 14px; display: flex; align-items: center; gap: 7px; cursor: pointer; text-align: left; }
 .epic-hdr:hover { background: #fafaf8; }
-.epic-pill { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: #eeedfe; color: #3c3489; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.epic-pill { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: #eeedfe; color: #3c3489; font-weight: 600; white-space: nowrap; flex-shrink: 0; text-decoration: none; }
+.epic-pill:hover { background: #dddcfd; }
 .epic-name { font-size: 13px; font-weight: 600; color: #1a1a1a; flex: 1; text-align: left; }
 .count-badge { font-size: 10px; color: #bbb; white-space: nowrap; }
 .chevron { color: #aaa; transition: transform 0.15s; flex-shrink: 0; width: 14px; height: 14px; }
 .epic-body { border-top: 1px solid #f0f0ee; }
 
-.story-block { margin: 10px 14px; border: 1px solid #e8e8e6; border-radius: 8px; overflow: hidden; }
-.story-hdr { width: 100%; background: none; border: none; padding: 9px 12px; display: flex; align-items: center; gap: 7px; cursor: pointer; text-align: left; }
+.story-block { margin: 8px 12px; border: 1px solid #e8e8e6; border-radius: 8px; overflow: hidden; }
+.story-hdr { width: 100%; background: none; border: none; padding: 8px 11px; display: flex; align-items: center; gap: 6px; cursor: pointer; text-align: left; }
 .story-hdr:hover { background: #fafaf8; }
-.story-pill { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: #e6f1fb; color: #185fa5; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.story-pill { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: #e6f1fb; color: #185fa5; font-weight: 600; white-space: nowrap; flex-shrink: 0; text-decoration: none; }
+.story-pill:hover { background: #d0e6f9; }
 .story-name { font-size: 12px; font-weight: 600; color: #1a1a1a; flex: 1; text-align: left; }
 .story-body { border-top: 1px solid #f0f0ee; }
 
-.assignee-group { padding: 2px 12px 6px; }
-.assignee-label { font-size: 10px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 0 3px; border-bottom: 1px solid #f5f5f3; margin-bottom: 2px; }
-
-.task-row { display: flex; align-items: center; gap: 7px; padding: 5px 0; border-bottom: 1px solid #f7f7f5; }
+.assignee-group { padding: 2px 11px 5px; }
+.assignee-label { font-size: 10px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; padding: 5px 0 2px; border-bottom: 1px solid #f5f5f3; margin-bottom: 1px; }
+.task-row { display: flex; align-items: center; gap: 6px; padding: 4px 0; border-bottom: 1px solid #f7f7f5; }
 .task-row:last-child { border-bottom: none; }
-.t-key { font-size: 10px; color: #bbb; min-width: 54px; font-family: 'SF Mono', 'Fira Code', monospace; flex-shrink: 0; }
-.t-key-link { text-decoration: none; color: #1a5fa8; }
-.t-key-link:hover { text-decoration: underline; }
+.t-key { font-size: 10px; min-width: 62px; font-family: 'SF Mono', 'Fira Code', monospace; flex-shrink: 0; text-decoration: none; color: #1a5fa8; }
+.t-key:hover { text-decoration: underline; }
 .t-sum { font-size: 12px; color: #333; flex: 1; line-height: 1.35; }
-.t-link { font-size: 11px; color: #1a5fa8; text-decoration: none; opacity: 0.5; flex-shrink: 0; }
-.t-link:hover { opacity: 1; }
-.av { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; flex-shrink: 0; }
-.av-k { background: #dbeafe; color: #1e40af; }
-.av-s { background: #fce7f3; color: #9d174d; }
-.av-p { background: #fef3c7; color: #92400e; }
-.av-n { background: #d1fae5; color: #065f46; }
-.av-a { background: #ede9fe; color: #5b21b6; }
-.av-u { background: #f3f4f6; color: #374151; }
+.av { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; flex-shrink: 0; }
 
-.direct-tasks { padding: 4px 14px 10px; }
+.direct-tasks { padding: 4px 12px 8px; }
+.standalone-block { background: #fff; border: 1px solid #e8e8e6; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+.standalone-hdr { padding: 9px 14px; font-size: 10px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #f0f0ee; }
+.standalone-body { padding: 4px 14px 8px; }
 
-.standalone-block { background: #fff; border: 1px solid #e8e8e6; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
-.standalone-hdr { padding: 10px 16px; font-size: 10px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #f0f0ee; }
-.standalone-body { padding: 4px 16px 8px; }
-
-.loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; gap: 14px; color: #888; }
-.spinner { width: 30px; height: 30px; border: 3px solid #f0f0ee; border-top-color: #534AB7; border-radius: 50%; animation: spin 0.8s linear infinite; }
+.loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; gap: 12px; color: #888; }
+.spinner { width: 26px; height: 26px; border: 3px solid #f0f0ee; border-top-color: #534AB7; border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.error-box { background: #fdecea; border: 1px solid #f5b8b3; border-radius: 8px; padding: 14px 18px; margin: 14px 0; color: #c0392b; font-size: 12px; }
+.error-box { background: #fdecea; border: 1px solid #f5b8b3; border-radius: 8px; padding: 12px 16px; margin: 12px 0; color: #c0392b; font-size: 12px; }
 
-.fnp-badge { font-size: 11px; font-weight: 600; color: #534AB7; background: #eeedfe; padding: 3px 10px; border-radius: 4px; }
+/* Sprint Report */
+.report-wrap { max-width: 1000px; margin: 0 auto; padding: 16px 20px 32px; }
+.report-title-bar { display: block; width: 3px; height: 16px; background: #534AB7; border-radius: 2px; }
+
+.report-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #e8e8e6; border-radius: 10px; overflow: hidden; font-size: 12px; }
+.report-table th { padding: 9px 12px; text-align: left; font-size: 10px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.05em; background: #fafaf8; border-bottom: 1px solid #e8e8e6; white-space: nowrap; }
+.report-table td { padding: 9px 12px; border-bottom: 1px solid #f5f5f3; vertical-align: middle; }
+.report-table tr:last-child td { border-bottom: none; }
+.report-table tr:hover td { background: #fafaf8; }
+.pod-badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 5px; cursor: pointer; white-space: nowrap; }
+.pod-badge:hover { opacity: 0.8; }
+.epic-hint { font-size: 10px; color: #aaa; margin-top: 2px; line-height: 1.3; }
+.prog-bar { width: 72px; height: 5px; background: #f0f0ee; border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 5px; }
+.prog-fill { height: 100%; background: #534AB7; border-radius: 3px; }
+.n-done { color: #2d7a31; font-weight: 600; }
+.n-dev  { color: #1a5fa8; font-weight: 600; }
+.n-rfqa { color: #8a6500; font-weight: 600; }
+.n-blk  { color: #c0392b; font-weight: 600; }
+.n-todo { color: #999; }
+.tc { text-align: center; }
+.report-spin { display: flex; align-items: center; gap: 8px; padding: 18px 0; color: #aaa; font-size: 12px; }
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="header-left">
-    <h1>🛒 CHC · Sprint Hierarchy</h1>
-    <p id="sprint-meta">Fetching active sprint from Jira…</p>
+    <h1 id="page-heading">FNP Sprint Hub</h1>
+    <p id="sprint-meta">Loading…</p>
   </div>
   <div class="header-right">
     <span id="last-updated" class="last-updated"></span>
-    <button class="refresh-btn" onclick="loadSprint()">
-      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M11 6.5A4.5 4.5 0 1 1 6.5 2a4.5 4.5 0 0 1 3.18 1.32M9.5 1v2.5H12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <button class="refresh-btn" onclick="refreshAll()">
+      <svg width="12" height="12" viewBox="0 0 13 13" fill="none"><path d="M11 6.5A4.5 4.5 0 1 1 6.5 2a4.5 4.5 0 0 1 3.18 1.32M9.5 1v2.5H12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Refresh
     </button>
   </div>
 </div>
 
+<div class="pod-tabs" id="pod-tabs">
+  <div class="tab-sep"></div>
+  <button class="report-tab" id="report-tab-btn">
+    <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M4 5h6M4 7.5h4M4 10h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    Sprint Report
+  </button>
+</div>
 <div id="stats-bar" class="stats-bar" style="display:none"></div>
 
-<div class="main">
-  <div class="legend">
-    <span class="sb s-done">Done</span>
-    <span class="sb s-dev">In Dev</span>
-    <span class="sb s-rfqa">Ready for QA</span>
-    <span class="sb s-inqa">In QA</span>
-    <span class="sb s-todo">To Do</span>
-    <span class="sb s-blocked">Blocked</span>
+<!-- POD hierarchy view -->
+<div id="pod-view">
+  <div class="main">
+    <div class="legend">
+      <span class="sb s-done">Done</span>
+      <span class="sb s-dev">In Dev</span>
+      <span class="sb s-rfqa">Ready for QA</span>
+      <span class="sb s-inqa">In QA</span>
+      <span class="sb s-todo">To Do</span>
+      <span class="sb s-blocked">Blocked</span>
+    </div>
+    <div id="loading" class="loading"><div class="spinner"></div><span>Connecting to Jira…</span></div>
+    <div id="error" class="error-box" style="display:none"></div>
+    <div id="content"></div>
   </div>
-  <div id="loading" class="loading">
-    <div class="spinner"></div>
-    <span>Connecting to Jira…</span>
+</div>
+
+<!-- Sprint report view (hidden by default) -->
+<div id="report-view" style="display:none">
+  <div class="report-wrap">
+    <div id="report-loading" class="report-spin"><div class="spinner"></div> Fetching all 10 PODs in parallel…</div>
+    <div id="report-content"></div>
   </div>
-  <div id="error" class="error-box" style="display:none"></div>
-  <div id="content"></div>
 </div>
 
 <script>
-// ⬇ Replace this URL after deploying proxy to Render
-const PROXY_URL = ''; // same origin — served by the Express server
-const JIRA_BASE = 'https://fnpcom.atlassian.net/browse/';
+const PROXY_URL = '';
+const JIRA_URL  = 'https://fnpcom.atlassian.net/browse/';
+
+function isoWeek(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+  const w1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d - w1) / 86400000 - 3 + (w1.getDay() + 6) % 7) / 7);
+}
+const WK = isoWeek(new Date());
+document.getElementById('page-title').textContent = `FNP W${WK} Work Progress`;
+document.getElementById('page-heading').textContent = `FNP W${WK} Work Progress`;
+document.getElementById('report-heading').textContent = `W${WK} Sprint Report — All PODs`;
+
+const PODS = [
+  { key: 'CHC',   name: 'Checkout',            owner: 'Rishabh',   color: '#3c3489', bg: '#eeedfe' },
+  { key: 'SUP',   name: 'Supply Chain',         owner: 'Divyansh',  color: '#0f6e56', bg: '#e1f5ee' },
+  { key: 'DSCVR', name: 'Discovery',            owner: 'Rishabh',   color: '#185fa5', bg: '#e6f1fb' },
+  { key: 'CPOST', name: 'Post Order & Support', owner: 'Rohit',     color: '#8a6500', bg: '#fff8e6' },
+  { key: 'APP',   name: 'Apps',                 owner: 'Rishabh',   color: '#993556', bg: '#fbeaf0' },
+  { key: 'DATA',  name: 'Data Engineering',     owner: '',          color: '#5b21b6', bg: '#ede9fe' },
+  { key: 'SRE',   name: 'SRE',                  owner: '',          color: '#444441', bg: '#f1efe8' },
+  { key: 'SDET',  name: 'SDET',                 owner: 'Mayank P',  color: '#3b6d11', bg: '#eaf3de' },
+  { key: 'OV',    name: 'Overseas',             owner: 'Naveen',    color: '#993c1d', bg: '#faece7' },
+  { key: 'BI',    name: 'BI',                   owner: 'Mayank B',  color: '#0c447c', bg: '#e6f1fb' },
+];
+
+let currentPod = 'CHC';
+
+// Build tabs
+const tabsEl = document.getElementById('pod-tabs');
+PODS.forEach(p => {
+  const btn = document.createElement('button');
+  btn.className = 'pod-tab' + (p.key === currentPod ? ' active' : '');
+  btn.textContent = p.name;
+  if (p.owner) btn.title = p.owner;
+  btn.id = 'tab-' + p.key;
+  btn.onclick = () => switchPod(p.key);
+  tabsEl.appendChild(btn);
+});
+
+function switchView(view) {
+  const isPod = view !== 'report';
+  document.getElementById('pod-view').style.display    = isPod ? '' : 'none';
+  document.getElementById('report-view').style.display = isPod ? 'none' : '';
+  document.getElementById('stats-bar').style.display   = isPod ? '' : 'none';
+  document.getElementById('report-tab-btn').classList.toggle('active', !isPod);
+  if (!isPod) {
+    document.querySelectorAll('.pod-tab').forEach(t => t.classList.remove('active'));
+  }
+}
+
+function switchPod(key) {
+  currentPod = key;
+  switchView('pod');
+  document.querySelectorAll('.pod-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + key).classList.add('active');
+  loadSprint(key);
+}
 
 function sc(s) {
   if (!s) return 's-todo';
@@ -135,19 +227,17 @@ function sc(s) {
   if (v === 'ready for qa') return 's-rfqa';
   if (v === 'in qa') return 's-inqa';
   if (v === 'blocked') return 's-blocked';
-  if (v.includes('open')) return 's-reopen';
+  if (v.includes('re-open') || v.includes('reopen')) return 's-reopen';
   return 's-todo';
 }
 
-function av(name) {
-  if (!name) return 'av-u';
-  const n = name.toLowerCase();
-  if (n.startsWith('karan')) return 'av-k';
-  if (n.includes('siddharth')) return 'av-s';
-  if (n.includes('prachi')) return 'av-p';
-  if (n.includes('niharika')) return 'av-n';
-  if (n.includes('aman')) return 'av-a';
-  return 'av-u';
+const AV_COLORS = ['#dbeafe','#fce7f3','#fef3c7','#d1fae5','#ede9fe','#fee2e2','#fef9c3','#e0f2fe','#fae8ff','#d1fae5'];
+const AV_TEXT   = ['#1e40af','#9d174d','#92400e','#065f46','#5b21b6','#991b1b','#713f12','#0369a1','#6b21a8','#065f46'];
+
+function avStyle(name) {
+  if (!name) return 'background:#f0f0ee;color:#888';
+  let h = 0; for (let c of name) h = (h * 31 + c.charCodeAt(0)) % AV_COLORS.length;
+  return `background:${AV_COLORS[h]};color:${AV_TEXT[h]}`;
 }
 
 function initials(name) {
@@ -159,84 +249,87 @@ function taskRow(issue) {
   const f = issue.fields;
   const name = f.assignee?.displayName || 'Unassigned';
   return `<div class="task-row">
-    <a href="${JIRA_BASE}${issue.key}" target="_blank" class="t-key t-key-link">${issue.key}</a>
-    <div class="av ${av(name)}" title="${name}">${initials(name)}</div>
+    <a href="${JIRA_URL}${issue.key}" target="_blank" class="t-key">${issue.key}</a>
+    <div class="av" style="${avStyle(name)}" title="${name}">${initials(name)}</div>
     <span class="t-sum">${f.summary}</span>
     <span class="sb ${sc(f.status?.name)}">${f.status?.name || 'To Do'}</span>
   </div>`;
 }
 
+// Sub-task map — populated in render(), used here
+let _subtaskMap = {};
+
+function taskWithSubtasks(issue) {
+  const subs = _subtaskMap[issue.key] || [];
+  const row = taskRow(issue);
+  if (!subs.length) return row;
+  return `<div>
+    ${row}
+    <div style="margin-left:28px;border-left:2px solid #f0f0ee;padding-left:4px">
+      ${subs.map(taskRow).join('')}
+    </div>
+  </div>`;
+}
+
 function storySection(story, tasks) {
-  const f = story.fields;
+  const f  = story.fields;
   const id = 'st-' + story.key;
   const byA = {};
   tasks.forEach(t => {
     const n = t.fields.assignee?.displayName || 'Unassigned';
-    if (!byA[n]) byA[n] = [];
-    byA[n].push(t);
+    (byA[n] = byA[n] || []).push(t);
   });
-  let body = tasks.length === 0
-    ? '<div style="padding:8px 12px;font-size:11px;color:#bbb">No tasks in sprint</div>'
+  // For stories with no tasks, show the story's own assignee in the body
+  const storyAssignee = f.assignee?.displayName;
+  const body = tasks.length === 0
+    ? `<div style="padding:7px 11px;font-size:11px;color:#bbb">No tasks linked in sprint${storyAssignee ? ` · <span style="color:#555;font-weight:500">${storyAssignee}</span>` : ''}</div>`
     : Object.entries(byA).map(([n, ts]) =>
-        `<div class="assignee-group"><div class="assignee-label">${n}</div>${ts.map(taskRow).join('')}</div>`
+        `<div class="assignee-group"><div class="assignee-label">${n}</div>${ts.map(taskWithSubtasks).join('')}</div>`
       ).join('');
-  const names = [...new Set(tasks.map(t => t.fields.assignee?.displayName).filter(Boolean))].join(', ');
+  // Show task assignees in header; if no tasks, fall back to story's own assignee
+  const names = tasks.length > 0
+    ? [...new Set(tasks.map(t => t.fields.assignee?.displayName).filter(Boolean))].join(', ')
+    : (storyAssignee || '');
   return `<div class="story-block">
-    <button class="story-hdr" onclick="tog('${id}', this)">
+    <button class="story-hdr" onclick="tog('${id}',this)">
       <svg class="chevron" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      <a href="${JIRA_BASE}${story.key}" target="_blank" onclick="event.stopPropagation()" class="story-pill">Story · ${story.key}</a>
+      <a href="${JIRA_URL}${story.key}" target="_blank" onclick="event.stopPropagation()" class="story-pill">Story · ${story.key}</a>
       <span class="story-name">${f.summary}</span>
-      ${names ? `<span style="font-size:10px;color:#bbb;white-space:nowrap;margin-right:4px">${names}</span>` : ''}
+      ${names ? `<span style="font-size:10px;color:#bbb;white-space:nowrap;margin-right:3px">${names}</span>` : ''}
       <span class="sb ${sc(f.status?.name)}">${f.status?.name || 'To Do'}</span>
     </button>
     <div class="story-body" id="${id}">${body}</div>
   </div>`;
 }
 
-function epicSection(epic, stories, tasks) {
-  const f = epic.fields;
+function epicSection(epic, stories, storyTasksMap, directTasks) {
+  const f  = epic.fields;
   const id = 'ep-' + epic.key;
-  const total = stories.length + tasks.length;
+  const storyTaskCount = Object.values(storyTasksMap).reduce((a, b) => a + b.length, 0);
+  const total = stories.length + storyTaskCount + directTasks.length;
 
-  const FE_NAMES = ['karan', 'siddharth'];
-  const BE_NAMES = ['prachi', 'niharika', 'aman'];
+  const storiesHtml = stories.map(s => storySection(s, storyTasksMap[s.key] || [])).join('');
 
-  const assignedKeys = new Set();
-  let storiesHtml = stories.map(s => {
-    let storyTasks = [];
-    if (s.key === 'CHC-7') {
-      storyTasks = tasks.filter(t => FE_NAMES.some(n => (t.fields.assignee?.displayName || '').toLowerCase().includes(n)));
-    } else if (s.key === 'CHC-133') {
-      storyTasks = tasks.filter(t => BE_NAMES.some(n => (t.fields.assignee?.displayName || '').toLowerCase().includes(n)));
-    }
-    storyTasks.forEach(t => assignedKeys.add(t.key));
-    return storySection(s, storyTasks);
-  }).join('');
-
-  const remaining = tasks.filter(t => !assignedKeys.has(t.key));
-  let remainHtml = '';
-  if (remaining.length > 0 && stories.length === 0) {
+  let directHtml = '';
+  if (directTasks.length > 0) {
     const byA = {};
-    remaining.forEach(t => {
-      const n = t.fields.assignee?.displayName || 'Unassigned';
-      if (!byA[n]) byA[n] = [];
-      byA[n].push(t);
-    });
-    remainHtml = '<div class="direct-tasks">' +
+    directTasks.forEach(t => { const n = t.fields.assignee?.displayName || 'Unassigned'; (byA[n] = byA[n] || []).push(t); });
+    directHtml = `<div class="direct-tasks">${
       Object.entries(byA).map(([n, ts]) =>
-        `<div class="assignee-label" style="margin-top:6px">${n}</div>${ts.map(taskRow).join('')}`
-      ).join('') + '</div>';
+        `<div class="assignee-label" style="margin-top:5px">${n}</div>${ts.map(taskWithSubtasks).join('')}`
+      ).join('')
+    }</div>`;
   }
 
   return `<div class="epic-block">
-    <button class="epic-hdr" onclick="tog('${id}', this)">
+    <button class="epic-hdr" onclick="tog('${id}',this)">
       <svg class="chevron" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      <a href="${JIRA_BASE}${epic.key}" target="_blank" onclick="event.stopPropagation()" class="epic-pill">Epic · ${epic.key}</a>
+      <a href="${JIRA_URL}${epic.key}" target="_blank" onclick="event.stopPropagation()" class="epic-pill">Epic · ${epic.key}</a>
       <span class="epic-name">${f.summary}</span>
       <span class="count-badge">${total} items</span>
       <span class="sb ${sc(f.status?.name)}">${f.status?.name || 'To Do'}</span>
     </button>
-    <div class="epic-body" id="${id}">${storiesHtml}${remainHtml}</div>
+    <div class="epic-body" id="${id}">${storiesHtml}${directHtml}</div>
   </div>`;
 }
 
@@ -249,63 +342,124 @@ function tog(id, btn) {
   if (ch) ch.style.transform = open ? 'rotate(-90deg)' : '';
 }
 
-function render(issues) {
-  const epics = issues.filter(i => i.fields.issuetype.name === 'Epic');
-  const stories = issues.filter(i => i.fields.issuetype.name === 'Story');
-  const tasks = issues.filter(i => ['Task', 'Bug', 'Sub-task'].includes(i.fields.issuetype.name));
+function render(issues, project) {
+  const epics    = issues.filter(i => i.fields.issuetype.name === 'Epic');
+  const stories  = issues.filter(i => i.fields.issuetype.name === 'Story');
+  const subtasks = issues.filter(i => i.fields.issuetype.name === 'Sub-task');
+  const tasks    = issues.filter(i => ['Task', 'Bug'].includes(i.fields.issuetype.name));
+
+  // Build subtask map keyed by parent task key
+  _subtaskMap = {};
+  subtasks.forEach(st => {
+    const pk = st.fields.parent?.key;
+    if (pk) (_subtaskMap[pk] = _subtaskMap[pk] || []).push(st);
+  });
 
   const epicMap = {};
-  epics.forEach(e => epicMap[e.key] = { epic: e, stories: [], tasks: [] });
-  stories.forEach(s => { const pk = s.fields.parent?.key; if (pk && epicMap[pk]) epicMap[pk].stories.push(s); });
-  tasks.forEach(t => { const pk = t.fields.parent?.key; if (pk && epicMap[pk]) epicMap[pk].tasks.push(t); });
+  epics.forEach(e => epicMap[e.key] = { epic: e, stories: [], directTasks: [] });
 
-  const standaloneStories = stories.filter(s => !s.fields.parent);
-  const standaloneTasks = tasks.filter(t => !t.fields.parent);
-  const standalone = [...standaloneStories, ...standaloneTasks];
+  // story → [] of tasks
+  const storyTaskMap = {};
+  stories.forEach(s => {
+    storyTaskMap[s.key] = [];
+    const pk = s.fields.parent?.key;
+    if (pk && epicMap[pk]) epicMap[pk].stories.push(s);
+  });
 
-  const total = issues.length;
-  const done = issues.filter(i => i.fields.status.name === 'Done').length;
-  const indev = issues.filter(i => i.fields.status.name === 'In Dev').length;
-  const rfqa = issues.filter(i => i.fields.status.name === 'Ready for QA').length;
+  // Assign tasks by parent.key — same rule for all PODs:
+  // parent is a story → goes under that story
+  // parent is an epic → shows as direct task under the epic
+  const assigned = new Set();
+  tasks.forEach(t => {
+    const pk = t.fields.parent?.key;
+    if (pk && storyTaskMap[pk] !== undefined) {
+      storyTaskMap[pk].push(t); assigned.add(t.key);
+    } else if (pk && epicMap[pk]) {
+      epicMap[pk].directTasks.push(t); assigned.add(t.key);
+    }
+  });
+
+  // Stats chips
+  const total   = issues.length;
+  const done    = issues.filter(i => i.fields.status.name === 'Done').length;
+  const indev   = issues.filter(i => i.fields.status.name === 'In Dev').length;
+  const rfqa    = issues.filter(i => i.fields.status.name === 'Ready for QA').length;
+  const inqa    = issues.filter(i => i.fields.status.name === 'In QA').length;
   const blocked = issues.filter(i => i.fields.status.name === 'Blocked').length;
 
   document.getElementById('stats-bar').innerHTML = `
     <div class="stat-chip chip-total"><span class="stat-num">${total}</span> Total</div>
     <div class="stat-chip chip-done"><span class="stat-num">${done}</span> Done</div>
     <div class="stat-chip chip-dev"><span class="stat-num">${indev}</span> In Dev</div>
-    <div class="stat-chip chip-rfqa"><span class="stat-num">${rfqa}</span> Ready for QA</div>
+    ${rfqa > 0 ? `<div class="stat-chip chip-rfqa"><span class="stat-num">${rfqa}</span> Ready for QA</div>` : ''}
+    ${inqa > 0 ? `<div class="stat-chip chip-rfqa"><span class="stat-num">${inqa}</span> In QA</div>` : ''}
     ${blocked > 0 ? `<div class="stat-chip chip-blocked"><span class="stat-num">${blocked}</span> Blocked</div>` : ''}
   `;
   document.getElementById('stats-bar').style.display = 'flex';
 
+  // Standalone stories = stories whose parent epic is not in this sprint
+  const standaloneStories = stories.filter(s => !s.fields.parent?.key || !epicMap[s.fields.parent?.key]);
+  // Unplaced items = tasks/bugs not placed under any story or epic
+  const unplaced = tasks.filter(t => !assigned.has(t.key));
+  // Split unplaced into bugs vs tasks
+  const standaloneBugs  = unplaced.filter(t => t.fields.issuetype.name === 'Bug');
+  const standaloneTasks = unplaced.filter(t => t.fields.issuetype.name !== 'Bug');
+
   let html = '';
-  Object.values(epicMap).forEach(({ epic, stories, tasks }) => {
-    html += epicSection(epic, stories, tasks);
+
+  // 1. Epic sections (Epic → Story → Task/Bug nested by parent.key)
+  Object.values(epicMap).forEach(({ epic, stories: epStories, directTasks }) => {
+    const sm = {};
+    epStories.forEach(s => sm[s.key] = storyTaskMap[s.key] || []);
+    html += epicSection(epic, epStories, sm, directTasks);
   });
-  if (standalone.length) {
+
+  // 2. Standalone stories — expandable story blocks with their tasks/bugs inside
+  if (standaloneStories.length) {
+    const storyBlocksHtml = standaloneStories
+      .map(s => storySection(s, storyTaskMap[s.key] || []))
+      .join('');
     html += `<div class="standalone-block">
-      <div class="standalone-hdr">Standalone — no Epic</div>
-      <div class="standalone-body">${standalone.map(taskRow).join('')}</div>
+      <div class="standalone-hdr">Stories — no Epic in sprint</div>
+      <div class="standalone-body" style="padding:6px 0">${storyBlocksHtml}</div>
     </div>`;
   }
-  document.getElementById('content').innerHTML = html;
+
+  // 3. Standalone tasks (not bugs) — flat rows
+  if (standaloneTasks.length) {
+    html += `<div class="standalone-block">
+      <div class="standalone-hdr">Tasks — no Story or Epic in sprint</div>
+      <div class="standalone-body">${standaloneTasks.map(taskRow).join('')}</div>
+    </div>`;
+  }
+
+  // 4. Standalone bugs — separate section
+  if (standaloneBugs.length) {
+    html += `<div class="standalone-block" style="border-color:#f5b8b3">
+      <div class="standalone-hdr" style="color:#c0392b;background:#fef9f9">🐞 Bugs — not linked to any Story or Epic</div>
+      <div class="standalone-body">${standaloneBugs.map(taskRow).join('')}</div>
+    </div>`;
+  }
+
+  document.getElementById('content').innerHTML = html || '<div style="padding:20px;color:#aaa;font-size:12px">No issues found in active sprint.</div>';
 }
 
-async function loadSprint() {
+async function loadSprint(project) {
+  project = project || currentPod;
   document.getElementById('loading').style.display = 'flex';
   document.getElementById('content').innerHTML = '';
   document.getElementById('error').style.display = 'none';
   document.getElementById('stats-bar').style.display = 'none';
-
+  const pod = PODS.find(p => p.key === project);
   try {
-    const res = await fetch(`${PROXY_URL}/api/sprint?project=CHC`);
+    const res = await fetch(`${PROXY_URL}/api/sprint?project=${project}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const issues = data.issues || [];
     const now = new Date().toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-    document.getElementById('sprint-meta').textContent = `CHC · Active Sprint · ${issues.length} items`;
+    document.getElementById('sprint-meta').textContent = `${pod?.name || project} · W${WK} · ${issues.length} items`;
     document.getElementById('last-updated').textContent = `Updated ${now}`;
-    render(issues);
+    render(issues, project);
   } catch (e) {
     document.getElementById('error').textContent = '⚠ Could not load sprint data: ' + e.message;
     document.getElementById('error').style.display = 'block';
@@ -315,7 +469,384 @@ async function loadSprint() {
   }
 }
 
-loadSprint();
+// ── Sprint Report ──────────────────────────────────────────────
+
+function counts(issues) {
+  const s = name => issues.filter(i => i.fields.status.name === name).length;
+  const total   = issues.length;
+  const done    = s('Done');
+  const indev   = s('In Dev');
+  const rfqa    = s('Ready for QA');
+  const inqa    = s('In QA');
+  const blocked = s('Blocked');
+  const todo    = issues.filter(i => ['To Do','Open','Backlog'].includes(i.fields.status.name)).length;
+  const pct     = total > 0 ? Math.round((done / total) * 100) : 0;
+  return { total, done, indev, rfqa, inqa, blocked, todo, pct };
+}
+
+// ── Report helpers ─────────────────────────────────────────────
+
+function cntS(issues, statuses) {
+  return issues.filter(i => statuses.includes(i.fields.status.name)).length;
+}
+
+function isReopen(issue) {
+  const s = (issue.fields.status.name || '').toLowerCase();
+  return s.includes('re-open') || s.includes('reopen');
+}
+
+function topAssignees(issues, limit) {
+  const m = {};
+  issues.forEach(i => {
+    const n = i.fields.assignee?.displayName;
+    if (n) m[n] = (m[n] || 0) + 1;
+  });
+  return Object.entries(m).sort((a,b) => b[1]-a[1]).slice(0, limit || 7);
+}
+
+function stackBar(issues) {
+  const tot = issues.length;
+  if (!tot) return '<div style="height:7px;background:#f0f0ee;border-radius:4px;margin:6px 0"></div>';
+  const p = n => (n / tot * 100).toFixed(2) + '%';
+  const done  = cntS(issues, ['Done']);
+  const dev   = cntS(issues, ['In Dev','In Progress']);
+  const qa    = cntS(issues, ['In QA','Ready for QA']);
+  const todo  = cntS(issues, ['To Do','Open','Backlog']);
+  const blk   = cntS(issues, ['Blocked']);
+  const ro    = issues.filter(isReopen).length;
+  const segs  = [
+    [done,'#1a9d3b','Done'], [dev,'#534AB7','In Dev'], [qa,'#f59e0b','In QA'],
+    [todo,'#c8c8c5','To Do'], [blk,'#dc2626','Blocked'], [ro,'#ea580c','Re-Open']
+  ];
+  return `<div style="display:flex;height:7px;border-radius:4px;overflow:hidden;background:#f0f0ee;margin:6px 0">
+    ${segs.filter(s=>s[0]>0).map(([n,c,l]) => `<div style="width:${p(n)};background:${c}" title="${l}: ${n}"></div>`).join('')}
+  </div>`;
+}
+
+function statusPills(issues) {
+  const defs = [
+    {names:['Done'],            label:'Done',         cls:'s-done'},
+    {names:['In Dev','In Progress'], label:'In Dev',  cls:'s-dev'},
+    {names:['Ready for QA'],    label:'Ready for QA', cls:'s-rfqa'},
+    {names:['In QA'],           label:'In QA',        cls:'s-inqa'},
+    {names:['To Do','Open','Backlog'], label:'To Do', cls:'s-todo'},
+    {names:['Blocked'],         label:'Blocked',      cls:'s-blocked'},
+  ];
+  const ro = issues.filter(isReopen).length;
+  const pills = defs.map(d => {
+    const n = cntS(issues, d.names);
+    return n ? `<span class="sb ${d.cls}">${n} ${d.label}</span>` : '';
+  }).filter(Boolean);
+  if (ro) pills.push(`<span class="sb s-reopen">${ro} Re-Open</span>`);
+  return pills.join(' ');
+}
+
+function podCard(d) {
+  const pod = PODS.find(p => p.key === d.project) || {key:d.project, name:d.project, color:'#888', bg:'#f0f0ee'};
+  const issues = d.issues || [];
+  const tot    = issues.length;
+  const done   = cntS(issues, ['Done']);
+  const pct    = tot > 0 ? Math.round(done/tot*100) : 0;
+  const assignees = topAssignees(issues, 7);
+  const hasErr = !tot && d.error;
+  return `<div style="background:#fff;border:1px solid #e8e8e6;border-radius:10px;padding:14px 16px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:#1a1a1a">${pod.name}</div>
+        ${pod.owner ? `<div style="font-size:10px;color:#aaa;margin-top:1px">${pod.owner}</div>` : ''}
+      </div>
+      <span class="pod-badge" style="background:${pod.bg};color:${pod.color};cursor:pointer;font-size:10px" onclick="switchPod('${pod.key}')">${pod.key}</span>
+    </div>
+    <div style="font-size:11px;color:#888;margin-bottom:6px;margin-top:4px">${hasErr ? '⚠ No sprint data' : tot+' items · '+pct+'% done'}</div>
+    ${stackBar(issues)}
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${statusPills(issues)}</div>
+    ${assignees.length ? `
+    <div style="margin-top:10px;border-top:1px solid #f5f5f3;padding-top:8px">
+      <div style="font-size:9px;font-weight:600;color:#bbb;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">Assignees (issue count)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px">
+        ${assignees.map(([n,c]) => `<span style="background:#f5f5f3;color:#444;font-size:10px;padding:2px 7px;border-radius:4px;white-space:nowrap">${n} <strong style="color:#534AB7">(${c})</strong></span>`).join('')}
+      </div>
+    </div>` : ''}
+  </div>`;
+}
+
+function keyDeliveriesHtml(data) {
+  const rows = data.map(d => {
+    const pod    = PODS.find(p => p.key === d.project) || {name:d.project, key:d.project, color:'#888', bg:'#f0f0ee'};
+    const issues = d.issues || [];
+    const doneN  = cntS(issues, ['Done']);
+    if (!doneN) return '';
+    // Prefer done epics; fall back to done stories
+    const doneSummaries = issues
+      .filter(i => i.fields.status.name === 'Done' && ['Epic','Story'].includes(i.fields.issuetype.name))
+      .sort((a,b) => (a.fields.issuetype.name === 'Epic' ? 0 : 1) - (b.fields.issuetype.name === 'Epic' ? 0 : 1))
+      .slice(0,4)
+      .map(i => i.fields.summary);
+    const text = doneSummaries.length
+      ? doneSummaries.map(s => s.length>72 ? s.slice(0,72)+'…' : s).join(' · ')
+      : `${doneN} items completed`;
+    return `<tr style="border-bottom:1px solid #f5f5f3">
+      <td style="padding:10px 12px;white-space:nowrap">
+        <span class="pod-badge" style="background:${pod.bg};color:${pod.color};cursor:pointer;font-size:10px" onclick="switchPod('${pod.key}')">${pod.name} (${pod.key})</span>
+        ${pod.owner ? `<div style="font-size:10px;color:#aaa;margin-top:3px;padding-left:2px">${pod.owner}</div>` : ''}
+      </td>
+      <td style="padding:10px 12px;font-size:11px;color:#444;line-height:1.5">${text}</td>
+      <td style="padding:10px 12px;text-align:center;font-weight:700;color:#1a9d3b;font-size:14px">${doneN}</td>
+    </tr>`;
+  }).filter(Boolean);
+  if (!rows.length) return '';
+  return `<div style="margin-bottom:16px">
+    <div style="font-size:11px;font-weight:700;color:#534AB7;text-transform:uppercase;letter-spacing:0.07em;padding-bottom:8px;border-bottom:2px solid #534AB7;margin-bottom:10px">KEY DELIVERIES THIS SPRINT</div>
+    <table style="width:100%;border-collapse:collapse;background:#fff;border:1px solid #e8e8e6;border-radius:10px;overflow:hidden">
+      <thead><tr style="background:#fafaf8;border-bottom:1px solid #e8e8e6">
+        <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.05em">POD</th>
+        <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.05em">Key Deliveries Completed</th>
+        <th style="padding:8px 12px;text-align:center;font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.05em">#Done</th>
+      </tr></thead>
+      <tbody>${rows.join('')}</tbody>
+    </table>
+  </div>`;
+}
+
+function needsAttentionHtml(data) {
+  const rows = [];
+  data.forEach(d => {
+    const pod    = PODS.find(p => p.key === d.project) || {name:d.project, key:d.project, color:'#888', bg:'#f0f0ee'};
+    const issues = d.issues || [];
+    issues.filter(i => i.fields.status.name === 'Blocked' || isReopen(i)).forEach(i => {
+      const s      = i.fields.status.name;
+      const isBlk  = s === 'Blocked';
+      const sBg    = isBlk ? '#fdecea' : '#fff7ed';
+      const sClr   = isBlk ? '#dc2626' : '#ea580c';
+      const action = isBlk ? 'Identify dependency & unblock' : 'Review root cause & reassign';
+      rows.push(`<tr style="border-bottom:1px solid #f5f5f3">
+        <td style="padding:10px 12px;white-space:nowrap">
+          <span class="pod-badge" style="background:${pod.bg};color:${pod.color};font-size:10px;cursor:pointer" onclick="switchPod('${pod.key}')">${pod.name} (${pod.key})</span>
+        </td>
+        <td style="padding:10px 12px;font-size:11px;color:#444">
+          <a href="${JIRA_URL}${i.key}" target="_blank" style="color:#1a5fa8;font-weight:600;font-family:monospace;font-size:10px;text-decoration:none">${i.key}</a>
+          — ${i.fields.summary}
+        </td>
+        <td style="padding:10px 12px;text-align:center;white-space:nowrap">
+          <span style="background:${sBg};color:${sClr};font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px">${s}</span>
+        </td>
+        <td style="padding:10px 12px;font-size:10px;color:#888">${action}</td>
+      </tr>`);
+    });
+  });
+  if (!rows.length) return '';
+  return `<div style="margin-bottom:16px">
+    <div style="font-size:11px;font-weight:700;color:#c0392b;text-transform:uppercase;letter-spacing:0.07em;padding-bottom:8px;border-bottom:2px solid #c0392b;margin-bottom:10px">NEEDS ATTENTION — BLOCKED &amp; RE-OPENED</div>
+    <table style="width:100%;border-collapse:collapse;background:#fff;border:1px solid #e8e8e6;border-radius:10px;overflow:hidden">
+      <thead><tr style="background:#fafaf8;border-bottom:1px solid #e8e8e6">
+        <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.05em">POD</th>
+        <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.05em">Issue / Description</th>
+        <th style="padding:8px 12px;text-align:center;font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.05em">Status</th>
+        <th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.05em">Recommended Action</th>
+      </tr></thead>
+      <tbody>${rows.join('')}</tbody>
+    </table>
+  </div>`;
+}
+
+function overallDistHtml(allIssues, data) {
+  const tot   = allIssues.length;
+  if (!tot) return '';
+  const done  = cntS(allIssues, ['Done']);
+  const dev   = cntS(allIssues, ['In Dev','In Progress']);
+  const qa    = cntS(allIssues, ['In QA','Ready for QA']);
+  const todo  = cntS(allIssues, ['To Do','Open','Backlog']);
+  const blk   = cntS(allIssues, ['Blocked']);
+  const ro    = allIssues.filter(isReopen).length;
+  const pct   = n => tot > 0 ? Math.round(n/tot*100) : 0;
+
+  // Conic gradient
+  const segs = [[done,'#1a9d3b'],[dev,'#534AB7'],[qa,'#f59e0b'],[todo,'#c8c8c5'],[blk,'#dc2626'],[ro,'#ea580c']];
+  let deg = 0;
+  const conic = segs.map(([n,c]) => {
+    const d2 = n/tot*360;
+    const part = `${c} ${deg.toFixed(1)}deg ${(deg+d2).toFixed(1)}deg`;
+    deg += d2; return part;
+  }).join(', ');
+
+  // Health bullets
+  const podsByDone = data.slice().sort((a,b) => cntS(b.issues||[],['Done']) - cntS(a.issues||[],['Done']));
+  const perfect    = data.filter(d => { const i=d.issues||[]; return i.length>0 && cntS(i,['Done'])===i.length; });
+  const topD       = podsByDone[0];
+  const topName    = PODS.find(p => p.key === topD?.project)?.name || topD?.project || '';
+  const topDoneN   = cntS(topD?.issues||[], ['Done']);
+
+  return `<div style="background:#fff;border:1px solid #e8e8e6;border-radius:10px;padding:18px;margin-bottom:16px">
+    <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:14px">OVERALL SPRINT STATUS DISTRIBUTION</div>
+    <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+      <!-- Pie -->
+      <div style="flex-shrink:0;text-align:center">
+        <div style="width:100px;height:100px;border-radius:50%;background:conic-gradient(${conic});position:relative;display:inline-block">
+          <div style="position:absolute;inset:20px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#1a1a1a">${tot}</div>
+        </div>
+        <div style="font-size:9px;color:#aaa;margin-top:4px">Total</div>
+      </div>
+      <!-- Legend -->
+      <div style="flex-shrink:0;padding-top:4px">
+        ${[['#1a9d3b',`Done: ${done} (${pct(done)}%)`],['#534AB7',`In Dev: ${dev} (${pct(dev)}%)`],
+           ['#f59e0b',`In QA: ${qa} (${pct(qa)}%)`],['#c8c8c5',`To Do: ${todo} (${pct(todo)}%)`],
+           ['#dc2626',`Blocked: ${blk} (${pct(blk)}%)`],['#ea580c',`Re-Open: ${ro} (${pct(ro)}%)`]]
+          .map(([c,l]) => `<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:11px">
+            <span style="width:10px;height:10px;border-radius:2px;background:${c};display:inline-block;flex-shrink:0"></span>${l}</div>`).join('')}
+      </div>
+      <!-- Health summary -->
+      <div style="flex:1;min-width:220px;border-left:1px solid #f0f0ee;padding-left:20px">
+        <div style="font-size:14px;font-weight:700;margin-bottom:10px">W${WK} Health Summary</div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px">${pct(done)}% of sprint stories delivered</div>
+        ${perfect.length ? `<div style="font-size:11px;margin-bottom:5px">• <strong>${PODS.find(p=>p.key===perfect[0].project)?.name||perfect[0].project} POD</strong> achieved 100% completion</div>` : ''}
+        ${topName ? `<div style="font-size:11px;margin-bottom:5px">• <strong>${topName}</strong> leads with ${topDoneN} stories Done</div>` : ''}
+        ${blk > 0 ? `<div style="font-size:11px;margin-bottom:5px;color:#c0392b">• <strong>${blk} item${blk>1?'s':''} Blocked</strong> need immediate attention</div>` : ''}
+        <div style="font-size:11px;margin-top:10px;font-weight:600;color:#534AB7">Total: ${tot} issues across ${data.filter(d=>(d.issues||[]).length>0).length} PODs</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderReport(data) {
+  const allIssues = data.flatMap(d => d.issues || []);
+  const tot       = allIssues.length;
+
+  // Week date range
+  const today    = new Date();
+  const dow      = (today.getDay() + 6) % 7;
+  const monday   = new Date(today); monday.setDate(today.getDate() - dow);
+  const sunday   = new Date(monday); sunday.setDate(monday.getDate() + 6);
+  const fmt      = d => d.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
+  const wkRange  = `${fmt(monday)} – ${fmt(sunday)}, ${monday.getFullYear()}`;
+  const snapshot = today.toISOString().slice(0,10);
+  const done     = cntS(allIssues, ['Done']);
+  const dev      = cntS(allIssues, ['In Dev','In Progress']);
+  const qa       = cntS(allIssues, ['In QA','Ready for QA']);
+  const blkRo    = cntS(allIssues, ['Blocked']) + allIssues.filter(isReopen).length;
+  const pctDone  = tot > 0 ? Math.round(done/tot*100) : 0;
+
+  // ── Header ──
+  let html = `<div style="background:#12122a;color:#fff;padding:18px 22px;border-radius:10px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px">
+        <span style="color:#534AB7">■</span> FNP Engineering — Sprint Dashboard
+      </div>
+      <div style="font-size:11px;color:#9ca3af;margin-top:5px">10 Engineering PODs · Weekly Sprint Snapshot</div>
+    </div>
+    <div style="text-align:right;font-size:11px">
+      <div style="color:#d1d5db">Sprint W${WK}-${today.getFullYear()} | ${wkRange}</div>
+      <div style="color:#9ca3af;margin-top:3px">Snapshot: ${snapshot}</div>
+      <div style="color:#60a5fa;margin-top:3px">Live data · fnpcom.atlassian.net</div>
+    </div>
+  </div>`;
+
+  // ── KPI Cards ──
+  const kpi = (label, val, sub, clr) =>
+    `<div style="background:#fff;padding:16px 18px;border-right:1px solid #e8e8e6">
+      <div style="font-size:9px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">${label}</div>
+      <div style="font-size:30px;font-weight:700;color:${clr};line-height:1">${val}</div>
+      <div style="font-size:10px;color:#aaa;margin-top:6px">${sub}</div>
+    </div>`;
+  html += `<div style="display:grid;grid-template-columns:repeat(5,1fr);background:#e8e8e6;gap:1px;border:1px solid #e8e8e6;border-radius:10px;overflow:hidden;margin-bottom:14px">
+    ${kpi('TOTAL ITEMS', tot, 'across all PODs', '#534AB7')}
+    ${kpi('DONE', done, pctDone+'% complete', '#1a9d3b')}
+    ${kpi('IN PROGRESS', dev, 'active dev work', '#1a5fa8')}
+    ${kpi('IN QA / REVIEW', qa, 'testing &amp; review', '#8a6500')}
+    ${kpi('BLOCKED / RE-OPEN', blkRo, 'needs attention', '#c0392b')}
+  </div>`;
+
+  // ── POD Status Breakdown (stacked bar chart) ──
+  const legend = [['#1a9d3b','Done'],['#534AB7','In Dev'],['#f59e0b','In QA'],['#c8c8c5','To Do'],['#dc2626','Blocked'],['#ea580c','Re-Open']];
+  html += `<div style="background:#fff;border:1px solid #e8e8e6;border-radius:10px;padding:16px 18px;margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:14px">POD Status Breakdown</div>
+    ${data.map(d => {
+      const pod = PODS.find(p => p.key === d.project) || {name:d.project};
+      const iss = d.issues || [];
+      if (!iss.length) return '';
+      const t = iss.length;
+      const p = n => (n/t*100).toFixed(2)+'%';
+      const dn = cntS(iss,['Done']), dv = cntS(iss,['In Dev','In Progress']),
+            qa2 = cntS(iss,['In QA','Ready for QA']), td = cntS(iss,['To Do','Open','Backlog']),
+            bk = cntS(iss,['Blocked']), ro = iss.filter(isReopen).length;
+      return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:5px">
+        <div style="width:170px;text-align:right;flex-shrink:0">
+          <div style="font-size:11px;color:#555">${pod.name}</div>
+          ${pod.owner ? `<div style="font-size:9px;color:#bbb">${pod.owner}</div>` : ''}
+        </div>
+        <div style="flex:1;display:flex;height:8px;border-radius:4px;overflow:hidden;background:#f0f0ee">
+          ${dn?`<div style="width:${p(dn)};background:#1a9d3b" title="Done:${dn}"></div>`:''}
+          ${dv?`<div style="width:${p(dv)};background:#534AB7" title="In Dev:${dv}"></div>`:''}
+          ${qa2?`<div style="width:${p(qa2)};background:#f59e0b" title="In QA:${qa2}"></div>`:''}
+          ${td?`<div style="width:${p(td)};background:#c8c8c5" title="To Do:${td}"></div>`:''}
+          ${bk?`<div style="width:${p(bk)};background:#dc2626" title="Blocked:${bk}"></div>`:''}
+          ${ro?`<div style="width:${p(ro)};background:#ea580c" title="Re-Open:${ro}"></div>`:''}
+        </div>
+        <div style="font-size:11px;color:#888;width:26px;text-align:right;flex-shrink:0">${t}</div>
+      </div>`;
+    }).join('')}
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid #f0f0ee">
+      ${legend.map(([c,l]) => `<span style="display:flex;align-items:center;gap:4px;font-size:11px"><span style="width:9px;height:9px;border-radius:50%;background:${c};display:inline-block"></span>${l}</span>`).join('')}
+    </div>
+  </div>`;
+
+  // ── POD Breakdown Cards (2-column) ──
+  html += `<div style="font-size:11px;font-weight:700;color:#534AB7;text-transform:uppercase;letter-spacing:0.07em;padding-bottom:8px;border-bottom:2px solid #534AB7;margin-bottom:12px">POD BREAKDOWN</div>`;
+  html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+    ${data.map(d => podCard(d)).join('')}
+  </div>`;
+
+  // ── Key Deliveries ──
+  html += keyDeliveriesHtml(data);
+
+  // ── Needs Attention ──
+  html += needsAttentionHtml(data);
+
+  // ── Overall Distribution ──
+  html += overallDistHtml(allIssues, data);
+
+  // ── Footer ──
+  html += `<div style="display:flex;justify-content:space-between;font-size:10px;color:#bbb;padding-top:6px">
+    <span>Auto-generated · FNP Engineering · ${snapshot}</span>
+    <span>fnpcom.atlassian.net/jira · Sprint W${WK}-${today.getFullYear()}</span>
+  </div>`;
+
+  document.getElementById('report-content').innerHTML = html;
+  document.getElementById('report-loading').style.display = 'none';
+}
+
+let allSprintsLoaded = false;
+
+async function loadAllSprints() {
+  document.getElementById('report-loading').style.display = 'flex';
+  document.getElementById('report-content').innerHTML = '';
+  allSprintsLoaded = false;
+  try {
+    const res = await fetch(`${PROXY_URL}/api/all-sprints`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    renderReport(data);
+    allSprintsLoaded = true;
+  } catch (e) {
+    document.getElementById('report-loading').innerHTML = `<span style="color:#c0392b">⚠ Could not load report: ${e.message}</span>`;
+  }
+}
+
+// Override report-tab click to trigger load if needed
+document.getElementById('report-tab-btn').addEventListener('click', () => {
+  switchView('report');
+  if (!allSprintsLoaded) loadAllSprints();
+});
+
+function refreshAll() {
+  if (document.getElementById('report-view').style.display === 'none') {
+    loadSprint(currentPod);
+  } else {
+    loadAllSprints();
+  }
+}
+
+// Init — load POD hierarchy only; report loads on demand
+loadSprint('CHC');
 </script>
 </body>
 </html>
