@@ -8,29 +8,31 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const JIRA_BASE = 'https://fnpcom.atlassian.net';
 const AUTH = 'Basic ' + Buffer.from(
-  `${process.env.JIRA_EMAIL}:${process.env.JIRA_TOKEN}`
+  `${process.env.JIRA_EMAIL}:${process.env.JIRA_TOKEN}`
 ).toString('base64');
 
 app.get('/api/sprint', async (req, res) => {
-  try {
-    const project = req.query.project || 'CHC';
-    const jql = `project = ${project} AND sprint in openSprints() ORDER BY issuetype ASC, created ASC`;
-    const fields = 'summary,issuetype,status,assignee,parent,priority';
-    const url = `${JIRA_BASE}/rest/api/3/search?jql=${encodeURIComponent(jql)}&fields=${fields}&maxResults=100`;
+  try {
+    const project = req.query.project || 'CHC';
+    const jql = `project = ${project} AND sprint in openSprints() ORDER BY issuetype ASC, created ASC`;
+    const fields = ['summary', 'issuetype', 'status', 'assignee', 'parent', 'priority'];
+    const url = `${JIRA_BASE}/rest/api/3/issue/search`;
 
-    const response = await fetch(url, {
-      headers: { 'Authorization': AUTH, 'Accept': 'application/json' }
-    });
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Authorization': AUTH, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jql, fields, maxResults: 100 })
+    });
 
-    if (!response.ok) {
-      return res.status(response.status).json({ error: 'Jira API error', status: response.status });
-    }
+    if (!response.ok) {
+      return res.status(response.status).json({ error: 'Jira API error', status: response.status });
+    }
 
-    const data = await response.json();
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.get('/health', (_, res) => res.json({ ok: true }));
