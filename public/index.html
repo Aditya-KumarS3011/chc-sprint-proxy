@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHC Sprint Dashboard</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a1a; font-size: 13px; }
+
+.header { background: #fff; border-bottom: 1px solid #e8e8e6; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+.header-left h1 { font-size: 16px; font-weight: 600; }
+.header-left p { font-size: 11px; color: #888; margin-top: 2px; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.refresh-btn { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 6px 14px; font-size: 12px; color: #555; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+.refresh-btn:hover { background: #f5f5f3; }
+.last-updated { font-size: 11px; color: #aaa; }
+
+.stats-bar { display: flex; gap: 8px; padding: 12px 20px; background: #fff; border-bottom: 1px solid #e8e8e6; flex-wrap: wrap; }
+.stat-chip { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 99px; font-size: 11px; font-weight: 500; border: 1px solid; }
+.chip-total { background: #f5f5f3; border-color: #ddd; color: #555; }
+.chip-done { background: #edf7ee; border-color: #b5ddb7; color: #2d7a31; }
+.chip-dev { background: #e8f1fb; border-color: #b3ccee; color: #1a5fa8; }
+.chip-rfqa { background: #fff8e6; border-color: #f0d882; color: #8a6500; }
+.chip-blocked { background: #fdecea; border-color: #f5b8b3; color: #c0392b; }
+.stat-num { font-weight: 700; font-size: 13px; }
+
+.main { padding: 16px 20px; max-width: 960px; margin: 0 auto; }
+
+.legend { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.sb { display: inline-flex; align-items: center; font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 500; white-space: nowrap; }
+.s-done { background: #edf7ee; color: #2d7a31; }
+.s-dev { background: #e8f1fb; color: #1a5fa8; }
+.s-rfqa { background: #fff8e6; color: #8a6500; }
+.s-inqa { background: #e1f5ee; color: #0f6e56; }
+.s-todo { background: #f0f0ee; color: #666; }
+.s-blocked { background: #fdecea; color: #c0392b; }
+.s-reopen { background: #fdecea; color: #c0392b; }
+
+.epic-block { background: #fff; border: 1px solid #e8e8e6; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+.epic-hdr { width: 100%; background: none; border: none; padding: 13px 16px; display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left; }
+.epic-hdr:hover { background: #fafaf8; }
+.epic-pill { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: #eeedfe; color: #3c3489; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.epic-name { font-size: 13px; font-weight: 600; color: #1a1a1a; flex: 1; text-align: left; }
+.count-badge { font-size: 10px; color: #bbb; white-space: nowrap; }
+.chevron { color: #aaa; transition: transform 0.15s; flex-shrink: 0; width: 14px; height: 14px; }
+.epic-body { border-top: 1px solid #f0f0ee; }
+
+.story-block { margin: 10px 14px; border: 1px solid #e8e8e6; border-radius: 8px; overflow: hidden; }
+.story-hdr { width: 100%; background: none; border: none; padding: 9px 12px; display: flex; align-items: center; gap: 7px; cursor: pointer; text-align: left; }
+.story-hdr:hover { background: #fafaf8; }
+.story-pill { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: #e6f1fb; color: #185fa5; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.story-name { font-size: 12px; font-weight: 600; color: #1a1a1a; flex: 1; text-align: left; }
+.story-body { border-top: 1px solid #f0f0ee; }
+
+.assignee-group { padding: 2px 12px 6px; }
+.assignee-label { font-size: 10px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 0 3px; border-bottom: 1px solid #f5f5f3; margin-bottom: 2px; }
+
+.task-row { display: flex; align-items: center; gap: 7px; padding: 5px 0; border-bottom: 1px solid #f7f7f5; }
+.task-row:last-child { border-bottom: none; }
+.t-key { font-size: 10px; color: #bbb; min-width: 54px; font-family: 'SF Mono', 'Fira Code', monospace; flex-shrink: 0; }
+.t-sum { font-size: 12px; color: #333; flex: 1; line-height: 1.35; }
+.t-link { font-size: 11px; color: #1a5fa8; text-decoration: none; opacity: 0.5; flex-shrink: 0; }
+.t-link:hover { opacity: 1; }
+.av { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; flex-shrink: 0; }
+.av-k { background: #dbeafe; color: #1e40af; }
+.av-s { background: #fce7f3; color: #9d174d; }
+.av-p { background: #fef3c7; color: #92400e; }
+.av-n { background: #d1fae5; color: #065f46; }
+.av-a { background: #ede9fe; color: #5b21b6; }
+.av-u { background: #f3f4f6; color: #374151; }
+
+.direct-tasks { padding: 4px 14px 10px; }
+
+.standalone-block { background: #fff; border: 1px solid #e8e8e6; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+.standalone-hdr { padding: 10px 16px; font-size: 10px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #f0f0ee; }
+.standalone-body { padding: 4px 16px 8px; }
+
+.loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; gap: 14px; color: #888; }
+.spinner { width: 30px; height: 30px; border: 3px solid #f0f0ee; border-top-color: #534AB7; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-box { background: #fdecea; border: 1px solid #f5b8b3; border-radius: 8px; padding: 14px 18px; margin: 14px 0; color: #c0392b; font-size: 12px; }
+
+.fnp-badge { font-size: 11px; font-weight: 600; color: #534AB7; background: #eeedfe; padding: 3px 10px; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>🛒 CHC · Sprint Hierarchy</h1>
+    <p id="sprint-meta">Fetching active sprint from Jira…</p>
+  </div>
+  <div class="header-right">
+    <span id="last-updated" class="last-updated"></span>
+    <button class="refresh-btn" onclick="loadSprint()">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M11 6.5A4.5 4.5 0 1 1 6.5 2a4.5 4.5 0 0 1 3.18 1.32M9.5 1v2.5H12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Refresh
+    </button>
+  </div>
+</div>
+
+<div id="stats-bar" class="stats-bar" style="display:none"></div>
+
+<div class="main">
+  <div class="legend">
+    <span class="sb s-done">Done</span>
+    <span class="sb s-dev">In Dev</span>
+    <span class="sb s-rfqa">Ready for QA</span>
+    <span class="sb s-inqa">In QA</span>
+    <span class="sb s-todo">To Do</span>
+    <span class="sb s-blocked">Blocked</span>
+  </div>
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <span>Connecting to Jira…</span>
+  </div>
+  <div id="error" class="error-box" style="display:none"></div>
+  <div id="content"></div>
+</div>
+
+<script>
+// ⬇ Replace this URL after deploying proxy to Render
+const PROXY_URL = ''; // same origin — served by the Express server
+const JIRA_BASE = 'https://fnpcom.atlassian.net/browse/';
+
+function sc(s) {
+  if (!s) return 's-todo';
+  const v = s.toLowerCase();
+  if (v === 'done') return 's-done';
+  if (v === 'in dev') return 's-dev';
+  if (v === 'ready for qa') return 's-rfqa';
+  if (v === 'in qa') return 's-inqa';
+  if (v === 'blocked') return 's-blocked';
+  if (v.includes('open')) return 's-reopen';
+  return 's-todo';
+}
+
+function av(name) {
+  if (!name) return 'av-u';
+  const n = name.toLowerCase();
+  if (n.startsWith('karan')) return 'av-k';
+  if (n.includes('siddharth')) return 'av-s';
+  if (n.includes('prachi')) return 'av-p';
+  if (n.includes('niharika')) return 'av-n';
+  if (n.includes('aman')) return 'av-a';
+  return 'av-u';
+}
+
+function initials(name) {
+  if (!name) return '?';
+  return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+}
+
+function taskRow(issue) {
+  const f = issue.fields;
+  const name = f.assignee?.displayName || 'Unassigned';
+  return `<div class="task-row">
+    <span class="t-key">${issue.key}</span>
+    <div class="av ${av(name)}" title="${name}">${initials(name)}</div>
+    <span class="t-sum">${f.summary}</span>
+    <span class="sb ${sc(f.status?.name)}">${f.status?.name || 'To Do'}</span>
+    <a href="${JIRA_BASE}${issue.key}" target="_blank" class="t-link">↗</a>
+  </div>`;
+}
+
+function storySection(story, tasks) {
+  const f = story.fields;
+  const id = 'st-' + story.key;
+  const byA = {};
+  tasks.forEach(t => {
+    const n = t.fields.assignee?.displayName || 'Unassigned';
+    if (!byA[n]) byA[n] = [];
+    byA[n].push(t);
+  });
+  let body = tasks.length === 0
+    ? '<div style="padding:8px 12px;font-size:11px;color:#bbb">No tasks in sprint</div>'
+    : Object.entries(byA).map(([n, ts]) =>
+        `<div class="assignee-group"><div class="assignee-label">${n}</div>${ts.map(taskRow).join('')}</div>`
+      ).join('');
+  const names = [...new Set(tasks.map(t => t.fields.assignee?.displayName).filter(Boolean))].join(', ');
+  return `<div class="story-block">
+    <button class="story-hdr" onclick="tog('${id}', this)">
+      <svg class="chevron" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span class="story-pill">Story · ${story.key}</span>
+      <span class="story-name">${f.summary}</span>
+      ${names ? `<span style="font-size:10px;color:#bbb;white-space:nowrap;margin-right:4px">${names}</span>` : ''}
+      <span class="sb ${sc(f.status?.name)}">${f.status?.name || 'To Do'}</span>
+      <a href="${JIRA_BASE}${story.key}" target="_blank" onclick="event.stopPropagation()" class="t-link">↗</a>
+    </button>
+    <div class="story-body" id="${id}">${body}</div>
+  </div>`;
+}
+
+function epicSection(epic, stories, tasks) {
+  const f = epic.fields;
+  const id = 'ep-' + epic.key;
+  const total = stories.length + tasks.length;
+
+  const FE_NAMES = ['karan', 'siddharth'];
+  const BE_NAMES = ['prachi', 'niharika', 'aman'];
+
+  const assignedKeys = new Set();
+  let storiesHtml = stories.map(s => {
+    let storyTasks = [];
+    if (s.key === 'CHC-7') {
+      storyTasks = tasks.filter(t => FE_NAMES.some(n => (t.fields.assignee?.displayName || '').toLowerCase().includes(n)));
+    } else if (s.key === 'CHC-133') {
+      storyTasks = tasks.filter(t => BE_NAMES.some(n => (t.fields.assignee?.displayName || '').toLowerCase().includes(n)));
+    }
+    storyTasks.forEach(t => assignedKeys.add(t.key));
+    return storySection(s, storyTasks);
+  }).join('');
+
+  const remaining = tasks.filter(t => !assignedKeys.has(t.key));
+  let remainHtml = '';
+  if (remaining.length > 0 && stories.length === 0) {
+    const byA = {};
+    remaining.forEach(t => {
+      const n = t.fields.assignee?.displayName || 'Unassigned';
+      if (!byA[n]) byA[n] = [];
+      byA[n].push(t);
+    });
+    remainHtml = '<div class="direct-tasks">' +
+      Object.entries(byA).map(([n, ts]) =>
+        `<div class="assignee-label" style="margin-top:6px">${n}</div>${ts.map(taskRow).join('')}`
+      ).join('') + '</div>';
+  }
+
+  return `<div class="epic-block">
+    <button class="epic-hdr" onclick="tog('${id}', this)">
+      <svg class="chevron" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span class="epic-pill">Epic · ${epic.key}</span>
+      <span class="epic-name">${f.summary}</span>
+      <span class="count-badge">${total} items</span>
+      <span class="sb ${sc(f.status?.name)}">${f.status?.name || 'To Do'}</span>
+      <a href="${JIRA_BASE}${epic.key}" target="_blank" onclick="event.stopPropagation()" class="t-link">↗</a>
+    </button>
+    <div class="epic-body" id="${id}">${storiesHtml}${remainHtml}</div>
+  </div>`;
+}
+
+function tog(id, btn) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : '';
+  const ch = btn.querySelector('.chevron');
+  if (ch) ch.style.transform = open ? 'rotate(-90deg)' : '';
+}
+
+function render(issues) {
+  const epics = issues.filter(i => i.fields.issuetype.name === 'Epic');
+  const stories = issues.filter(i => i.fields.issuetype.name === 'Story');
+  const tasks = issues.filter(i => ['Task', 'Bug', 'Sub-task'].includes(i.fields.issuetype.name));
+
+  const epicMap = {};
+  epics.forEach(e => epicMap[e.key] = { epic: e, stories: [], tasks: [] });
+  stories.forEach(s => { const pk = s.fields.parent?.key; if (pk && epicMap[pk]) epicMap[pk].stories.push(s); });
+  tasks.forEach(t => { const pk = t.fields.parent?.key; if (pk && epicMap[pk]) epicMap[pk].tasks.push(t); });
+
+  const standaloneStories = stories.filter(s => !s.fields.parent);
+  const standaloneTasks = tasks.filter(t => !t.fields.parent);
+  const standalone = [...standaloneStories, ...standaloneTasks];
+
+  const total = issues.length;
+  const done = issues.filter(i => i.fields.status.name === 'Done').length;
+  const indev = issues.filter(i => i.fields.status.name === 'In Dev').length;
+  const rfqa = issues.filter(i => i.fields.status.name === 'Ready for QA').length;
+  const blocked = issues.filter(i => i.fields.status.name === 'Blocked').length;
+
+  document.getElementById('stats-bar').innerHTML = `
+    <div class="stat-chip chip-total"><span class="stat-num">${total}</span> Total</div>
+    <div class="stat-chip chip-done"><span class="stat-num">${done}</span> Done</div>
+    <div class="stat-chip chip-dev"><span class="stat-num">${indev}</span> In Dev</div>
+    <div class="stat-chip chip-rfqa"><span class="stat-num">${rfqa}</span> Ready for QA</div>
+    ${blocked > 0 ? `<div class="stat-chip chip-blocked"><span class="stat-num">${blocked}</span> Blocked</div>` : ''}
+  `;
+  document.getElementById('stats-bar').style.display = 'flex';
+
+  let html = '';
+  Object.values(epicMap).forEach(({ epic, stories, tasks }) => {
+    html += epicSection(epic, stories, tasks);
+  });
+  if (standalone.length) {
+    html += `<div class="standalone-block">
+      <div class="standalone-hdr">Standalone — no Epic</div>
+      <div class="standalone-body">${standalone.map(taskRow).join('')}</div>
+    </div>`;
+  }
+  document.getElementById('content').innerHTML = html;
+}
+
+async function loadSprint() {
+  document.getElementById('loading').style.display = 'flex';
+  document.getElementById('content').innerHTML = '';
+  document.getElementById('error').style.display = 'none';
+  document.getElementById('stats-bar').style.display = 'none';
+
+  try {
+    const res = await fetch(`${PROXY_URL}/api/sprint?project=CHC`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const issues = data.issues || [];
+    const now = new Date().toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    document.getElementById('sprint-meta').textContent = `CHC · Active Sprint · ${issues.length} items`;
+    document.getElementById('last-updated').textContent = `Updated ${now}`;
+    render(issues);
+  } catch (e) {
+    document.getElementById('error').textContent = '⚠ Could not load sprint data: ' + e.message;
+    document.getElementById('error').style.display = 'block';
+    document.getElementById('sprint-meta').textContent = 'Error loading data';
+  } finally {
+    document.getElementById('loading').style.display = 'none';
+  }
+}
+
+loadSprint();
+</script>
+</body>
+</html>
